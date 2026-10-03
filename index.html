@@ -18,11 +18,11 @@
 
     <script>
         const GIST_ID = "63d1564f673fdab3cbc31067da2f0c80";
-        const URL_API = `https://github.com${GIST_ID}`;
+        const URL_API = "https://github.com" + GIST_ID;
 
         fetch(URL_API, { cache: 'no-store' })
-            .then(res => res.json())
-            .then(gist => {
+            .then(function(res) { return res.json(); })
+            .then(function(gist) {
                 let alvo = gist.files["link.txt"].content.trim();
 
                 if (alvo && alvo !== "offline") {
@@ -36,7 +36,8 @@
                     document.getElementById("loader").style.display = "none";
                 }
             })
-            .catch(() => {
+            .catch(function(error) {
+                console.error(error);
                 document.getElementById("status").innerText = "Erro ao conectar com o servidor central.";
                 document.getElementById("loader").style.display = "none";
             });
