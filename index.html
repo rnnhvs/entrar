@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Conectando ao Servidor</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #121212; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+        .loader { border: 4px solid #333; border-top: 4px solid #007bff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn { display: none; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="loader" id="loader"></div>
+    <h1 id="status">Buscando endereço do servidor...</h1>
+    <a href="#" id="botao" class="btn">Clique para Entrar</a>
+
+    <script>
+        const GIST_ID = "63d1564f673fdab3cbc31067da2f0c80";
+        const URL_API = `https://github.com{GIST_ID}`;
+
+        fetch(URL_API, { cache: 'no-store' })
+            .then(res => res.json())
+            .then(gist => {
+                let alvo = gist.files["link.txt"].content.trim();
+
+                if (alvo && alvo !== "offline") {
+                    document.getElementById("status").innerText = "Redirecionando...";
+                    document.getElementById("botao").href = alvo;
+                    document.getElementById("botao").style.display = "inline-block";
+                    
+                    window.location.href = alvo;
+                } else {
+                    document.getElementById("status").innerHTML = "O servidor está <span style='color:#ff4a4a'>OFFLINE</span>.";
+                    document.getElementById("loader").style.display = "none";
+                }
+            })
+            .catch(() => {
+                document.getElementById("status").innerText = "Erro ao conectar com o servidor central.";
+                document.getElementById("loader").style.display = "none";
+            });
+    </script>
+</body>
+</html>
