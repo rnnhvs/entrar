@@ -16,31 +16,38 @@
     <h1 id="status">Buscando endereço do servidor...</h1>
     <a href="#" id="botao" class="btn">Clique para Entrar</a>
 
-    <script>
+        <script>
         const GIST_ID = "63d1564f673fdab3cbc31067da2f0c80";
-        const URL_API = "https://github.com" + GIST_ID;
+        
+        const URL_RAW = "https://githubusercontent.com" + GIST_ID + "/raw/link.txt?nocache=" + Math.random();
 
-        fetch(URL_API, { cache: 'no-store' })
-            .then(function(res) { return res.json(); })
-            .then(function(gist) {
-                let alvo = gist.files["link.txt"].content.trim();
+        function buscarLink() {
+            fetch(URL_RAW, { cache: 'no-store' })
+                .then(function(res) { return res.text(); })
+                .then(function(conteudo) {
+                    let alvo = conteudo.trim();
 
-                if (alvo && alvo !== "offline") {
-                    document.getElementById("status").innerText = "Redirecionando...";
-                    document.getElementById("botao").href = alvo;
-                    document.getElementById("botao").style.display = "inline-block";
-                    
-                    window.location.href = alvo;
-                } else {
-                    document.getElementById("status").innerHTML = "O servidor está <span style='color:#ff4a4a'>OFFLINE</span>.";
+                    if (alvo && alvo !== "offline" && alvo.includes("trycloudflare.com")) {
+                        document.getElementById("status").innerText = "Redirecionando...";
+                        document.getElementById("botao").href = alvo;
+                        document.getElementById("botao").style.display = "inline-block";
+                        
+                        window.location.href = alvo;
+                    } else {
+                        document.getElementById("status").innerHTML = "O servidor está <span style='color:#ff4a4a'>OFFLINE</span>.";
+                        document.getElementById("loader").style.display = "none";
+                        document.getElementById("botao").style.display = "none";
+                    }
+                })
+                .catch(function(error) {
+                    console.error(error);
+                    document.getElementById("status").innerText = "Erro ao conectar com o servidor central.";
                     document.getElementById("loader").style.display = "none";
-                }
-            })
-            .catch(function(error) {
-                console.error(error);
-                document.getElementById("status").innerText = "Erro ao conectar com o servidor central.";
-                document.getElementById("loader").style.display = "none";
-            });
+                });
+        }
+
+        buscarLink();
     </script>
+
 </body>
 </html>
