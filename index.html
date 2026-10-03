@@ -1,53 +1,67 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head> 
+<head>
     <meta charset="UTF-8">
-    <title>Conectando ao Servidor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Servidor Local</title>
     <style>
         body { font-family: Arial, sans-serif; background: #121212; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
-        .loader { border: 4px solid #333; border-top: 4px solid #007bff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        .box { border: 1px solid #333; padding: 40px; border-radius: 8px; background: #1a1a1a; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .loader { border: 4px solid #333; border-top: 4px solid #007bff; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .btn { display: none; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 15px; }
+        .btn { display: none; padding: 14px 28px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 15px; transition: background 0.2s; }
+        .btn:hover { background: #0056b3; }
+        h1 { font-size: 22px; font-weight: normal; margin-top: 0; margin-bottom: 20px; }
+        #link-texto { display: block; color: #888; font-size: 12px; margin-top: 15px; word-break: break-all; }
     </style>
 </head>
 <body>
 
-    <div class="loader" id="loader"></div>
-    <h1 id="status">Buscando endereço do servidor...</h1>
-    <a href="#" id="botao" class="btn">Clique para Entrar</a>
-
-        <script>
-        const GIST_ID = "63d1564f673fdab3cbc31067da2f0c80";
+    <div class="box">
+        <div class="loader" id="loader"></div>
+        <h1 id="status">Verificando servidor...</h1>
         
-        const URL_RAW = "https://githubusercontent.com" + GIST_ID + "/raw/link.txt?nocache=" + Math.random();
+        <!-- Botão que apenas exibe o link para clique humano -->
+        <a href="#" id="botao" class="btn" target="_blank">Acessar Servidor Local</a>
+        <small id="link-texto"></small>
+    </div>
 
-        function buscarLink() {
-            fetch(URL_RAW, { cache: 'no-store' })
-                .then(function(res) { return res.text(); })
-                .then(function(conteudo) {
-                    let alvo = conteudo.trim();
+    <script type="text/javascript">
+        (function() {
+            // Consulta o arquivo de texto gravado pelo Linux quebrando o cache
+            const URL_ARQUIVO = "https://github.io" + Date.now();
 
+            fetch(URL_ARQUIVO, { cache: "no-store" })
+                .then(function(res) {
+                    if (!res.ok) throw new Error("Não foi possível ler as coordenadas.");
+                    return res.text();
+                })
+                .then(function(textoBruto) {
+                    const alvo = textoBruto.trim();
+
+                    // Se o túnel estiver ativo, revela o link e o botão na tela
                     if (alvo && alvo !== "offline" && alvo.includes("trycloudflare.com")) {
-                        document.getElementById("status").innerText = "Redirecionando...";
-                        document.getElementById("botao").href = alvo;
-                        document.getElementById("botao").style.display = "inline-block";
-                        
-                        window.location.href = alvo;
-                    } else {
-                        document.getElementById("status").innerHTML = "O servidor está <span style='color:#ff4a4a'>OFFLINE</span>.";
+                        document.getElementById("status").innerText = "Servidor Online! 🎉";
                         document.getElementById("loader").style.display = "none";
-                        document.getElementById("botao").style.display = "none";
+                        
+                        const btn = document.getElementById("botao");
+                        btn.href = alvo;
+                        btn.style.display = "inline-block";
+                        
+                        // Mostra a URL por extenso logo abaixo do botão por segurança
+                        document.getElementById("link-texto").innerText = alvo;
+                    } else {
+                        // Se o Linux estiver fechado ou gravado como offline
+                        document.getElementById("status").innerHTML = "Servidor <span style='color:#ff4a4a; font-weight:bold;'>OFFLINE</span>";
+                        document.getElementById("loader").style.display = "none";
                     }
                 })
-                .catch(function(error) {
-                    console.error(error);
-                    document.getElementById("status").innerText = "Erro ao conectar com o servidor central.";
+                .catch(function(err) {
+                    console.error(err);
+                    document.getElementById("status").innerText = "Erro ao carregar o painel.";
                     document.getElementById("loader").style.display = "none";
                 });
-        }
-
-        buscarLink();
+        })();
     </script>
-
 </body>
 </html>
